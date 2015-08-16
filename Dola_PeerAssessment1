@@ -1,0 +1,107 @@
+#PEER ASSESSMENT 1#
+##Dola Pathak##
+
+Reading in the data using the following command.
+
+```{r}
+pa_1<-read.csv("C:\\Users\\dola\\Desktop\\Peer Assignment 1.csv", sep=",", header=TRUE)
+x<-pa_1$steps
+y<-pa_1$date
+z<-pa_1$interval
+```
+
+The total number of steps per day (ignoring the missing values) is:
+```{r}
+tot_steps<-tapply(x,format(y), sum, na.rm=TRUE) 
+sum(tot_steps, na.rm=TRUE)
+```
+
+The histogram for the total steps per day is:
+```{r}
+hist(tot_steps)
+```
+```{r echo=TRUE}
+av<-mean(tot_steps, na.rm=TRUE)
+median<-median(tot_steps, na.rm=TRUE)
+```
+
+The average number of steps taken per day and th median of the data is :
+```{r echo=TRUE}
+av
+median
+```
+
+The time series plot of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all days (y-axis) is a s follows:
+
+```{r}
+tot_steps2<-tapply(x, format(z), sum, na.rm=TRUE) 
+plot(tot_steps2, type="l", xlab="Intervals", ylab="Total Steps per day", ylim=c(min(tot_steps2), max(tot_steps2))) 
+
+```
+
+The total number of missing values in the data set is:
+```{r}
+length(x==NA)
+```
+
+The missing values were replaced by the mean of the total number of steps taken per day and the data was further analysing the data reanalysed.
+```{r}
+x[is.na(x)] =mean(x, na.rm=TRUE)
+tot_steps<-tapply(x, format(y), sum) 
+length(tot_steps)
+sum(tot_steps, na.rm=TRUE)
+```
+
+The histogram of the new data is:
+```{r}
+hist(tot_steps)
+```
+
+```{r}
+av_2<-mean(tot_steps, na.rm=TRUE)
+med_2<-median(tot_steps, na.rm=TRUE)
+``````
+
+The mean and the median are as follows:
+```{r echo=TRUE}
+av_2
+med_2
+```
+
+Thus we see that the on including the mean value for the missing data, the mean of the distribution went up from 9354.23 to 10766.19 and the median also increased from 10395 to 10766.19. The distribution became more symmetric as was evident from the histogram and the mean median value.
+
+```{r}
+#Fourth Part
+library(lubridate)
+date<-as.Date(pa_1$date)
+df = data.frame(date) 
+df$day <- weekdays(as.Date(df$date))
+w<-as.POSIXlt(df$date)$wday
+wend<-(w==0)|(w==6)
+weekend<-(as.numeric(wend))
+w.f<-factor(weekend,levels=c(0,1),
+            labels=c("Weekday","Weekend"))
+pa_1_new<-data.frame(pa_1,weekend,w.f)
+```
+
+The data set after introduing two new variables to identify weekdays vs weekends , one identifying weekends as 1 and weekdays as 0 and the other identifying weekdays and weekends as characters, is as follows:
+
+```{r}
+head(pa_1_new)
+```
+```{r}
+x1<-pa_1_new$steps
+y1<-pa_1_new$date
+z1<-pa_1_new$interval
+x1[is.na(x1)] =mean(x1, na.rm=TRUE)
+x1_new<-tapply(x1, format(y1), sum) 
+```
+
+The panel plot for comparing the total number of steps during weekend vs on weekdays is as follows:
+
+```{r}
+library(lattice)
+xyplot(x1 ~ z1 | w.f, data=pa_1_new, pch=19,
+       main="Total Steps during week vs weekends",
+      layout=c(1,2),type=c("l","l"), xlim=c(min(z1),max(z1)), xlab="Interval", ylab="Totals steps")
+```
